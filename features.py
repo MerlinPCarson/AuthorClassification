@@ -7,11 +7,15 @@ import argparse
 import numpy as np
 from glob import glob
 from tqdm import tqdm
+from info_gain import prune_dataset
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Feature creator for author classification')
-    parser.add_argument('--text_dir', type=str, default='txts')
-    parser.add_argument('--full_ds', type=str, default='full_dataset.npy')
+    parser.add_argument('--text_dir', type=str, default='txts', help='Directory with texts to process for dataset')
+    parser.add_argument('--full_ds', type=str, default='full_dataset.npy', help='File to save full feature set to')
+    parser.add_argument('--pruned_ds', type=str, default='dataset.npy', help='File to save pruned dataset to')
+    parser.add_argument('--load_ds', default=True, action='store_true', help='Load features from file instead of generating them')
+    parser.add_argument('--n_feats', type=int, default=300, help='Number features to keep')
 
     return parser.parse_args()
 
@@ -66,7 +70,7 @@ def read_paragraphs(txt):
 
 def paragraphs_to_features(dict_words, txt, paragraphs, classes):
     paragraph_features = []
-    for i, paragraph in tqdm(enumerate(paragraphs, start=1)):
+    for i, paragraph in enumerate(paragraphs, start=1):
         features = np.zeros((len(dict_words)+1))
         words = find_unique_words(paragraph)
 
@@ -97,6 +101,10 @@ def create_dataset(dict_words, text_dir, classes):
 
     return paragraph_features
 
+def print_data(dataset, features):
+    for i, data in enumerate(dataset):
+        print(data[0], features[i])
+
 def main(args):
     start = time.time()
 
@@ -106,14 +114,26 @@ def main(args):
     # define classes
     classes = {'austin': 0, 'shelley': 1}
 
-    # create dataset of all features from all paragraphs
-    full_dataset = create_dataset(dict_words, args.text_dir, classes)
+    # Generate Dataset
+    if not args.load_ds:
+        # create dataset of all features from all paragraphs
+        full_dataset = create_dataset(dict_words, args.text_dir, classes)
 
-    # save full dataset to file
-    pickle.dump(full_dataset, open(args.full_ds, 'wb'))
+        # save full dataset to file
+        pickle.dump(full_dataset, open(args.full_ds, 'wb'))
+    # Load dataset from file
+    else:
+        # load full dataset from file
+        full_dataset = pickle.load(open(args.full_ds,'rb'))
 
-    # load full dataset from file
-    full_dataset = pickle.load(open(args.full_ds,'rb'))
+    # find top features
+    pruned_features = prune_dataset(full_dataset, args.n_feats, dict_words)
+
+    # print pruned dataset
+    #print_data(full_dataset, pruned_features)
+
+    # save pruned features to disk
+    pickle.dump(pruned_features, open(args.pruned_ds, 'wb'))
 
     print(f'Script completed in {time.time()-start:.2f} secs')
 

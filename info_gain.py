@@ -35,11 +35,11 @@ def calc_gain(features, split_idx):
 def prune_dataset(dataset, n_feats, f_dict):
 
     gains = []
-    features = np.array([feats[1] for feats in dataset])[:,:100]
+    features = np.array([feats[1] for feats in dataset])
     print('Calculating information gain for split at each feature')
     for key, value in tqdm(f_dict.items()):
-        if value >= 100:
-            break
+        #if value >= 100:
+        #    break
         gains.append(calc_gain(features, value))
 
     # find features with largest information gain and prune out the rest
