@@ -11,7 +11,18 @@ def calc_entropy(features, split_idx, epsilon=1e-12):
     pr_pos = num_pos/(num_pos+num_neg)
     pr_neg = 1.0 - pr_pos
 
-    entropy = -(pr_pos * log2(pr_pos+epsilon) + pr_neg * log2(pr_neg+epsilon))
+    # check for domain errors
+    if pr_pos > 0:
+        e_pos = pr_pos * log2(pr_pos)
+    else:
+        e_pos = 0
+
+    if pr_neg > 0:
+        e_neg = pr_neg * log2(pr_neg)
+    else:
+        e_neg = 0
+
+    entropy = -(e_pos + e_neg)
     return entropy
 
 def calc_gain(features, split_idx):
@@ -34,7 +45,8 @@ def calc_gain(features, split_idx):
 
 def prune_dataset(dataset, n_feats, f_dict):
 
-    gains = []
+    # skip first element since features start at 1, and -1.1 > all gains
+    gains = [-1.1]
     features = np.array([feats[1] for feats in dataset])
     print('Calculating information gain for split at each feature')
     for key, value in tqdm(f_dict.items()):
