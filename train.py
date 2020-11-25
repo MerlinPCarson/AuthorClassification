@@ -47,7 +47,7 @@ def kfold_validation(features, labels, algorithm='XGB', num_folds=2):
             model.fit(X_train, y_train)
 
         if args.algorithm == 'XGB':
-            model = XGB(verbosity=1, n_estimators=1000, max_depth=8, reg_lambda=1e-2, reg_alpha=4)
+            model = XGB(verbosity=1, n_estimators=1000, max_depth=3, reg_lambda=1, reg_alpha=1e-4)
             model.fit(X_train, y_train, eval_set=[(X_val,y_val)], eval_metric='logloss', verbose=True, early_stopping_rounds=20)
 
         train_score = model.score(X_train, y_train)
