@@ -1,7 +1,7 @@
 # AuthorClassification
-ID3 for feature selection (words) from text and Machine Learning to classifiy the author from selected features
-by Merlin Carson
-Python3
+ID3 for feature selection (words) from text and Machine Learning to classifiy the author from selected features  
+by Merlin Carson  
+Python3  
 
 # Requirements
 * Sklearn
