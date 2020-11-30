@@ -1,5 +1,5 @@
 # AuthorClassification
-ID3 for feature selection (words) from text and Machine Learning to classifiy the author from selected features  
+Information gain for feature selection (words) from text and Machine Learning to classifiy the author from selected features  
 by Merlin Carson  
 
 # Requirements
