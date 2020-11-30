@@ -1,9 +1,9 @@
 # AuthorClassification
 ID3 for feature selection (words) from text and Machine Learning to classifiy the author from selected features  
 by Merlin Carson  
-Python3  
 
 # Requirements
+* Python3
 * Sklearn
 
 I first parsed all the text using REGEX to capture only alpha chars from all words > length 2, thus removing all punctuation, numeric values and words containing only 1 char. I converted this list of words to a set to remove all duplicates, this is the dictionary of words. I then parse each text paragraph, creating a list of words using the same constraints as stated above for creating the dictionary. I iterate through the dictionary for each paragraph, checking for each word in the text, setting the feature to true if it's in the paragraph and setting it false if it is not. The text's name and paragraph number along with the class (author) is concatenated with the feature vector for the paragraph.
