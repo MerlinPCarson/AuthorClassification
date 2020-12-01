@@ -6,6 +6,10 @@ by Merlin Carson
 * Python3
 * Sklearn
 
+# Usage
+python3 features.py > features.csv
+python3 train.py --dataset features.csv --num_folds 10 --algorithm <'NB' for Naive Bayes, 'XGB' for XGBoost, 'RF' for Random Forest>
+
 I first parsed all the text using REGEX to capture only alpha chars from all words > length 2, thus removing all punctuation, numeric values and words containing only 1 char. I converted this list of words to a set to remove all duplicates, this is the dictionary of words. I then parse each text paragraph, creating a list of words using the same constraints as stated above for creating the dictionary. I iterate through the dictionary for each paragraph, checking for each word in the text, setting the feature to true if it's in the paragraph and setting it false if it is not. The text's name and paragraph number along with the class (author) is concatenated with the feature vector for the paragraph.
 
 After the feature vectors are created for all parapraphs in all the texts, the gain is calculated for each word split in the dictionary. The feature set is then pruned to only keep the words that have the highest gains. This information is then printed to standard output and saved to file for use by a machine learner.
