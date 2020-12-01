@@ -48,7 +48,7 @@ def prune_dataset(dataset, n_feats, f_dict):
     # skip first element since features start at 1, and -1.1 > all gains
     gains = [-1.1]
     features = np.array([feats[1] for feats in dataset])
-    print('Calculating information gain for split at each feature')
+    #print('Calculating information gain for split at each feature')
     for key, value in tqdm(f_dict.items()):
         #if value >= 100:
         #    break
@@ -57,7 +57,7 @@ def prune_dataset(dataset, n_feats, f_dict):
     # find features with largest information gain and prune out the rest
     top_feats = sorted(np.argpartition(gains,-n_feats)[-n_feats:])
 
-    print(f'Gains: {np.array(gains)[top_feats]}')
+    #print(f'Gains: {np.array(gains)[top_feats]}')
 
     # add class idx into features to keep
     top_feats = np.insert(top_feats, 0, 0)

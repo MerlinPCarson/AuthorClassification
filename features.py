@@ -14,7 +14,8 @@ def parse_args():
     parser.add_argument('--text_dir', type=str, default='txts', help='Directory with texts to process for dataset')
     parser.add_argument('--full_ds', type=str, default='full_dataset.npy', help='File to save full feature set to')
     parser.add_argument('--pruned_ds', type=str, default='dataset.npy', help='File to save pruned dataset to')
-    parser.add_argument('--load_ds', default=True, action='store_true', help='Load features from file instead of generating them')
+    parser.add_argument('--load_full_ds', default=False, action='store_true', help='Loads full feature from file instead of generating them')
+    parser.add_argument('--save_full_ds', default=False, action='store_true', help='Saves full feature set from file instead of generating them')
     parser.add_argument('--n_feats', type=int, default=300, help='Number features to keep')
 
     return parser.parse_args()
@@ -36,7 +37,7 @@ def find_unique_words(text):
 def create_dictionary(text_dir):
 
     dict_words = []
-    print('Creating dictionary of words')
+    #print('Creating dictionary of words')
     for txt in tqdm(glob(os.path.join(text_dir, '*.txt'), recursive=True)):
         with open(txt, 'r') as f:
             words = find_unique_words(f.read())
@@ -71,7 +72,7 @@ def read_paragraphs(txt):
 def paragraphs_to_features(dict_words, txt, paragraphs, classes):
     paragraph_features = []
     for i, paragraph in enumerate(paragraphs, start=1):
-        features = np.zeros((len(dict_words)+1))
+        features = np.zeros((len(dict_words)+1)).astype('uint8')
         words = find_unique_words(paragraph)
 
         # set class
@@ -93,7 +94,7 @@ def create_dataset(dict_words, text_dir, classes):
     
     paragraph_features = []
 
-    print('Creating full dataset')
+    #print('Creating full dataset')
     for txt in tqdm(glob(os.path.join(text_dir, '*.txt'), recursive=True)):
         txt_paragraphs = read_paragraphs(txt)
         features = paragraphs_to_features(dict_words, txt, txt_paragraphs, classes)
@@ -101,9 +102,22 @@ def create_dataset(dict_words, text_dir, classes):
 
     return paragraph_features
 
-def print_data(dataset, features):
+def data_to_csv(dataset, features):
+    csv = []
     for i, data in enumerate(dataset):
-        print(data[0], features[i])
+        line = [data[0]]
+        for feat in features[i]:
+            line.append(str(feat))
+        csv.append(line)
+
+    return csv
+
+def print_data(dataset):
+    for line in dataset:
+        print(line[0], end='')
+        for feat in line[1:]:
+            print(f', {feat}', end='')
+        print()
 
 def main(args):
     start = time.time()
@@ -115,12 +129,13 @@ def main(args):
     classes = {'austin': 0, 'shelley': 1}
 
     # Generate Dataset
-    if not args.load_ds:
+    if not args.load_full_ds:
         # create dataset of all features from all paragraphs
         full_dataset = create_dataset(dict_words, args.text_dir, classes)
 
         # save full dataset to file
-        pickle.dump(full_dataset, open(args.full_ds, 'wb'))
+        if args.save_full_ds:
+            pickle.dump(full_dataset, open(args.full_ds, 'wb'))
     # Load dataset from file
     else:
         # load full dataset from file
@@ -130,12 +145,13 @@ def main(args):
     pruned_features = prune_dataset(full_dataset, args.n_feats, dict_words)
 
     # print pruned dataset
-    #print_data(full_dataset, pruned_features)
+    csv = data_to_csv(full_dataset, pruned_features)
+    print_data(csv)
 
     # save pruned features to disk
     pickle.dump(pruned_features, open(args.pruned_ds, 'wb'))
 
-    print(f'Script completed in {time.time()-start:.2f} secs')
+    #print(f'Script completed in {time.time()-start:.2f} secs')
 
     return 0
 
