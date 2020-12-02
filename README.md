@@ -4,7 +4,10 @@ by Merlin Carson
 
 # Requirements
 * Python3
+* Numpy 
+* Pandas
 * Sklearn
+* XGBoost 
 
 # Usage
 python3 features.py > features.csv  

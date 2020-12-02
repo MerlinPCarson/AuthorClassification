@@ -1,3 +1,7 @@
+#!/usr/bin/python3
+# word feature extractor from text using ID3 
+# by Merlin Carson
+
 import os
 import re
 import sys
@@ -20,7 +24,9 @@ def parse_args():
 
     return parser.parse_args()
 
+# returns a list of unique words for a text string
 def find_unique_words(text):
+    # regex for alpha chars only
     regex = re.compile('[^a-zA-Z]')
     clean_words = []
     words = text.split()
@@ -33,7 +39,7 @@ def find_unique_words(text):
 
     return list(set(clean_words))
 
-
+# creates a dictionary of unique words for directory of text files
 def create_dictionary(text_dir):
 
     dict_words = []
@@ -49,6 +55,7 @@ def create_dictionary(text_dir):
 
     return dict_words
 
+# seperates paragraphs from a text file
 def read_paragraphs(txt):
     with open(txt, 'r') as f:
         text = f.read()
@@ -69,6 +76,8 @@ def read_paragraphs(txt):
 
     return paragraphs
 
+# for each word in the dictionary determines if it exists in a paragraph
+# along with assigning a unique ID to paragraph and class label
 def paragraphs_to_features(dict_words, txt, paragraphs, classes):
     paragraph_features = []
     for i, paragraph in enumerate(paragraphs, start=1):
@@ -90,6 +99,8 @@ def paragraphs_to_features(dict_words, txt, paragraphs, classes):
 
     return paragraph_features
 
+# creates the dataset of paragraph features given a dictionary of words/author classes
+# from a directory of texts 
 def create_dataset(dict_words, text_dir, classes):
     
     paragraph_features = []
@@ -102,22 +113,16 @@ def create_dataset(dict_words, text_dir, classes):
 
     return paragraph_features
 
+# converts dataset into CSV format
 def data_to_csv(dataset, features):
-    csv = []
+    csv = '' 
     for i, data in enumerate(dataset):
-        line = [data[0]]
+        csv += f'{data[0]}'
         for feat in features[i]:
-            line.append(str(feat))
-        csv.append(line)
+            csv += f', {str(feat)}'
+        csv += '\n'
 
     return csv
-
-def print_data(dataset):
-    for line in dataset:
-        print(line[0], end='')
-        for feat in line[1:]:
-            print(f', {feat}', end='')
-        print()
 
 def main(args):
     start = time.time()
@@ -146,10 +151,7 @@ def main(args):
 
     # print pruned dataset
     csv = data_to_csv(full_dataset, pruned_features)
-    print_data(csv)
-
-    # save pruned features to disk
-    pickle.dump(pruned_features, open(args.pruned_ds, 'wb'))
+    print(csv)
 
     #print(f'Script completed in {time.time()-start:.2f} secs')
 
